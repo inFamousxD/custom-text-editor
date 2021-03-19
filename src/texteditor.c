@@ -47,37 +47,35 @@ void enableTerminalRawMode() {
         die("tcsetarr");
 }
 
-// char editorReadKeyStrokes() {
-//     int nread;
-//     char c;
-//     while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
-//         if (nread == -1 && errno != EAGAIN) die("read");
-//     return c;
-// }
+char editorReadKeyStrokes() {
+    int nread;
+    char c;
+    while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
+        if (nread == -1 && errno != EAGAIN) die("read");
+    return c;
+}
 
-// void editorProcessKeyStrokes() {
-//     char c = editorReadKeyStrokes();
+void editorProcessKeyStrokes() {
+    char c = editorReadKeyStrokes();
 
-//     switch (c) {
-//     case CTRL_KEY('q'):
-//         exit(0);
-//         break;
-//     }
-// }
+    switch (c) {
+    case CTRL_KEY('q'):
+        exit(0);
+        break;
+    }
+}
+
+void editorRefreshScreen() {
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+}
 
 int main() {
     enableTerminalRawMode();
 
     char c;
     while (1) {
-        char c = '\0';
-        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) 
-            die("read");
-        if (iscntrl(c)) 
-            printf("%d\r\n", c);
-        else 
-            printf("%d('%c')\r\n", c, c);
-        if (c == CTRL_KEY('q') || c == CTRL_KEY('Q')) break;
+        editorRefreshScreen();
+        editorProcessKeyStrokes();
     }
 
     return 0;
