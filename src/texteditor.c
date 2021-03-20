@@ -504,6 +504,7 @@ void editorProcessKeyStrokes() {
             exit(0);
             break;
         case CTRL_KEY('s'):
+        case CTRL_KEY('x'):
             editorSave();
             break;
         case HOME_KEY:
@@ -695,7 +696,7 @@ int main(int argc, char *argv[]) {
     if (argc >= 2) {
         editorOpen(argv[1]);
     }
-    editorSetStatusMessage("HELP: Ctrl-S = save || Ctrl-D = quit");
+    editorSetStatusMessage("HELP: Ctrl-S/X = save || Ctrl-D/Q = quit");
     while (1) {
         editorRefreshScreen();
         editorProcessKeyStrokes();
