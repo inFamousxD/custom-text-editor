@@ -572,15 +572,15 @@ void editorScroll() {
 void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
-        int filerow = y + E.rowoff;
-        if (filerow >= E.numrows) {
+        int fileRow = y + E.rowoff;
+        if (fileRow >= E.numrows) {
             if (y == E.screenrows / 3 && E.numrows == 0) {
             char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
+            int welcomeLen = snprintf(welcome, sizeof(welcome),
                 "Custom Editor -- version %s", EDITOR_VERSION);
             
-            if (welcomelen > E.screencols) welcomelen = E.screencols;
-            int padding = (E.screencols - welcomelen) / 2;
+            if (welcomeLen > E.screencols) welcomeLen = E.screencols;
+            int padding = (E.screencols - welcomeLen) / 2;
             
             if (padding) {
                 abAppend(ab, "~", 1);
@@ -588,17 +588,17 @@ void editorDrawRows(struct abuf *ab) {
             }
             
             while (padding--) abAppend(ab, " ", 1);
-                abAppend(ab, welcome, welcomelen);
+                abAppend(ab, welcome, welcomeLen);
             } else {
                 abAppend(ab, "~", 1);
             }
         } else {
-            int len = E.row[filerow].rsize - E.coloff;
+            int len = E.row[fileRow].rsize - E.coloff;
             if (len < 0) 
                 len = 0;
             if (len > E.screencols)
                 len = E.screencols;
-            abAppend(ab, &E.row[filerow].render[E.coloff], len);
+            abAppend(ab, &E.row[fileRow].render[E.coloff], len);
         }
         
         abAppend(ab, "\x1b[K", 3);
