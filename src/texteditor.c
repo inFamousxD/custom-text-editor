@@ -87,6 +87,50 @@ void disableTerminalRawMode() {
         die("tcsetattr");
 }
 
+/* RAWMODE INFO
+RawMode > Why?
+--> Terminals, by default, are launched into canonical mode or cooked mode. i.e. Keyboard input is only sent to after pressing 'ENTER'.
+--> Raw Mode disables this and directly enables us to process each keypress as it comes in.
+
+RawMode > How?
+[1] Disable <ECHO> flag.
+ECHO causes each key typed to be displayed on the Terminal. Turning this off is the first step to enter Raw Mode.
+ECHO is a BITFLAG representated with 4th-bit in c_lflag (local flags) as -> 00000000000000000000000000001000. Using bitwise-NOT we get -> 11111111111111111111111111110111. We then use bitwise-AND to flip 4th-bit to 0 while retaining other bits' original data.
+
+[2] Disable <ICANON> flag.
+ICANON flag represents canonical mode. Disabling this enables byte-by-byte input reading instead of line-by-line.
+ICANON is another local c_lflag BITFLAG. Disabled same way -> NOT, AND operations in order to c_lflag
+
+[3] Disable <ISIG> flag
+ISIG is responsible for CTRL+C, CTRL+Z, CTRL+Y Control sequences.
+ISIG is a local flag in c_lflag.
+
+[4] Disable <IXON> flag
+IXON flag governs CTRL+Q and CTRL+S Control sequences also known as software flow. CTRL+S stops data flow until CTRL+Q is pressed.
+IXON is an input flag from termios.h
+
+[5] Disable <IEXTEN> flag
+IEXTEN flag waits for a character input to send it to the terminal 'literally'. This is initiated by CTRL+V.
+IEXTEN is a local flag in c_lflag.
+
+[6] Disable <ICRNL> flag
+ICRNL flag translates carriage returns into newlines (13, '\r') -> (10, '\n'). This is also achieved by pressing ENTER or CTRL+M
+ICRNL flag is a local flag in c_lflag.
+
+[7] Disable <OPOST> flag
+OPOST flag refers to Output-Post-Processing. Terminals with OPOST enabled translate '\n' --> '\r\n\'.
+OPOST is an output flag, disabled same as any other c_lflag methods above.
+
+[8] Disable <BRKINT>, <INPCK>, <ISTRIP> Miscellaneous flags
+When BRKINT is turned on, a break condition will cause a SIGINT signal to be sent to the program, like pressing Ctrl-C.
+INPCK enables parity checking, which doesn’t seem to apply to modern terminal emulators.
+ISTRIP causes the 8th bit of each input byte to be stripped, meaning it will set it to 0. This is probably already turned off.
+
+[9] Disable <CS8> Bit Mask
+CS8 is not a flag, it is a bit mask with multiple bits, which we set using the bitwise-OR (|) operator unlike all the flags we are turning off. It sets the character size (CS) to 8 bits per byte. On my system, it’s already set that way.
+
+--> Raw Mode Enabled
+*/
 void enableTerminalRawMode() {
     if (tcgetattr(STDIN_FILENO, &E.original_termios) == -1)
         die("tcgetattr");
